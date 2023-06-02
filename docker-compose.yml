@@ -1,0 +1,49 @@
+#verion: '3.8'
+services:
+
+  postgres:
+    restart: always
+    container_name: postgres
+    image: postgres
+    environment:
+      POSTGRES_USER: 'postgres'
+      POSTGRES_PASSWORD: 'Wild54323'
+      POSTGRES_DB: 'postgres'
+    ports:
+      - 5432:5432
+
+  app:
+    build: .
+    container_name: app
+    image: app
+    environment:
+      PG_URL: 'postgres://postgres:Wild54323@postgres:5432/postgres'
+    ports:
+      - 8080:8080
+    depends_on:
+      - postgres
+  app1:
+    build: .
+    container_name: app1
+    image: app1
+    environment:
+      PG_URL: 'postgres://postgres:Wild54323@postgres:5432/postgres'
+    ports:
+      - 8083:8080
+    depends_on:
+      - postgres
+  nginx:
+    restart: always
+    container_name: nginx
+    image: nginx
+    ports:
+      - 8082:8082
+    volumes:
+      - './nginx/custom/myconf.conf:/etc/nginx/nginx.conf'
+      - './nginx/custom/www/index.html:/etc/nginx/www/index.html'
+    links:
+      - app
+      - app1
+    depends_on:
+      - app
+      - app1
