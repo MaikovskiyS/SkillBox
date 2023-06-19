@@ -45,9 +45,10 @@ func TestCreateUser(t *testing.T) {
 		t.Run(testCases.name, func(t *testing.T) {
 			c := gomock.NewController(t)
 			defer c.Finish()
+
 			l := logrus.New()
 			middle := middleware.New(l)
-			engine := gin.Default()
+			engine := gin.New()
 			svc := mock_handler.NewMockUserService(c)
 			testCases.mockBehavior(svc, testCases.inputData)
 
