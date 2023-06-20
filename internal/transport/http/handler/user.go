@@ -5,7 +5,9 @@ import (
 	"fmt"
 	"net/http"
 	"skillbox/internal/domain/model"
+	"skillbox/internal/transport/http/dto"
 	"skillbox/internal/transport/http/middleware"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 	"github.com/sirupsen/logrus"
@@ -18,6 +20,7 @@ type UserService interface {
 	UpdateUserAge(ctx context.Context, id, age uint64) error
 	DeleteUser(ctx context.Context, id uint64) error
 }
+
 //go:generate mockgen -source=user.go -destination=mocks/mock.go
 
 type Handler struct {
@@ -56,12 +59,21 @@ func (h *Handler) Hello(c *gin.Context) {
 
 //CreateUser...
 func (h *Handler) CreateUser(c *gin.Context) {
-	var user model.User
-	name := c.Keys["name"]
-	age := c.Keys["age"]
-	user.Name = name.(string)
-	user.Age = age.(uint64)
+	var data dto.CreateUserDTO
+	err := c.ShouldBindJSON(data)
+	if err != nil {
+		c.String(http.StatusBadRequest, "cant parse params.Err:", err.Error())
+		return
+	}
 	defer c.Request.Body.Close()
+	err = data.Validate()
+	if err != nil {
+		c.String(http.StatusBadRequest, "validation failed. Err:", err.Error())
+		return
+	}
+	var user model.User
+	user.Name = data.Age
+	user.Name = data.Name
 	id, err := h.svc.CreateUser(c, user)
 	if err != nil {
 		c.String(http.StatusBadRequest, "cant create User")
@@ -72,12 +84,27 @@ func (h *Handler) CreateUser(c *gin.Context) {
 
 //MakeFriend...
 func (h *Handler) MakeFriend(c *gin.Context) {
-	value1 := c.Keys["target"]
-	value2 := c.Keys["source"]
-	target := value1.(uint64)
-	source := value2.(uint64)
+	var data dto.MakeFriendDTO
+	err := c.Bind(data)
+	if err != nil {
+		c.String(http.StatusBadRequest, "cant parse params.Err:", err.Error())
+		return
+	}
 	defer c.Request.Body.Close()
-	targetName, sourceName, err := h.svc.MakeFriend(c, source, target)
+	err = data.Validate()
+	if err != nil {
+		c.String(http.StatusBadRequest, "validation failed. Err:", err.Error())
+		return
+	}
+	target, err := strconv.Atoi(data.Target)
+	if err != nil {
+		c.String(http.StatusInternalServerError, "server error", err.Error())
+	}
+	source, err := strconv.Atoi(data.Source)
+	if err != nil {
+		c.String(http.StatusInternalServerError, "server error", err.Error())
+	}
+	targetName, sourceName, err := h.svc.MakeFriend(c, uint64(source), uint64(target))
 	if err != nil {
 		c.String(http.StatusInternalServerError, err.Error())
 		return
@@ -87,13 +114,24 @@ func (h *Handler) MakeFriend(c *gin.Context) {
 
 //DeleteUser...
 func (h *Handler) DeleteUser(c *gin.Context) {
-	value := c.Keys["id"]
-	id, ok := value.(uint64)
-	if !ok {
+	var data dto.DeleteUserDto
+	err := c.Bind(&data)
+	if err != nil {
+		c.String(http.StatusBadRequest, "cant parse params.Err:", err.Error())
 		return
 	}
 	defer c.Request.Body.Close()
-	err := h.svc.DeleteUser(c, id)
+	err = data.Validate()
+	if err != nil {
+		c.String(http.StatusBadRequest, "validation failed. Err:", err.Error())
+		return
+	}
+	id, err := strconv.Atoi(data.Id)
+	if err != nil {
+		c.String(http.StatusBadRequest, "validation failed. Err:", err.Error())
+		return
+	}
+	err = h.svc.DeleteUser(c, uint64(id))
 	if err != nil {
 		switch err.Error() {
 		case "user not found":
@@ -110,10 +148,21 @@ func (h *Handler) DeleteUser(c *gin.Context) {
 
 //GetFriends...
 func (h *Handler) GetFriends(c *gin.Context) {
-	value := c.Keys["id"]
-	id := value.(uint64)
+	var data dto.GetFriendsDto
+	idstr := c.Query("id")
 	defer c.Request.Body.Close()
-	friends, err := h.svc.GetFriends(c, id)
+	id, err := strconv.Atoi(idstr)
+	if err != nil {
+		c.String(http.StatusBadRequest, "ivalid params. Err:", err.Error())
+		return
+	}
+	data.Id = uint64(id)
+	err = data.Validate()
+	if err != nil {
+		c.String(http.StatusBadRequest, "validation failed. Err:", err.Error())
+		return
+	}
+	friends, err := h.svc.GetFriends(c, uint64(id))
 	if err != nil {
 		c.String(http.StatusBadRequest, err.Error())
 		return
@@ -123,12 +172,33 @@ func (h *Handler) GetFriends(c *gin.Context) {
 
 //UpdateAge...
 func (h *Handler) UpdateUserAge(c *gin.Context) {
-	value1 := c.Keys["id"]
-	value2 := c.Keys["age"]
-	id := value1.(uint64)
-	age := value2.(uint64)
+	var data dto.UpdateUserAgeDTO
+	err := c.Bind(&data)
+	if err != nil {
+		c.String(http.StatusBadRequest, "ivalid params. Err:", err.Error())
+		return
+	}
 	defer c.Request.Body.Close()
-	err := h.svc.UpdateUserAge(c, id, age)
+	idstr := c.Query("id")
+	id, err := strconv.Atoi(idstr)
+	if err != nil {
+		c.String(http.StatusBadRequest, "ivalid params. Err:", err.Error())
+		return
+	}
+
+	data.Id = uint64(id)
+	err = data.Validate()
+	if err != nil {
+		c.String(http.StatusBadRequest, "validation failed. Err:", err.Error())
+		return
+	}
+	age, err := strconv.Atoi(data.Age)
+	if err != nil {
+		c.String(http.StatusBadRequest, "ivalid params. Err:", err.Error())
+		return
+	}
+
+	err = h.svc.UpdateUserAge(c, uint64(id), uint64(age))
 	if err != nil {
 		c.String(http.StatusInternalServerError, "cant update age")
 		return
