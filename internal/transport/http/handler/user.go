@@ -44,11 +44,11 @@ func New(svc UserService, router *gin.Engine, mw *middleware.Middleware, logger 
 func (h *Handler) RegisterRoutes() {
 	h.l.Info("register Routes")
 	h.router.GET("/", h.Hello)
-	h.router.POST("/create", h.mw.CreateUserValidation(h.CreateUser))
-	h.router.POST("/make_friends", h.mw.MakeFriendValidation(h.MakeFriend))
-	h.router.DELETE("/user", h.mw.DeleteUserValidation(h.DeleteUser))
-	h.router.GET("/friends", h.mw.GetFriendsValidation(h.GetFriends))
-	h.router.PUT("/user_id", h.mw.UpdateUserAgeValidation(h.UpdateUserAge))
+	h.router.POST("/create", (h.CreateUser))
+	h.router.POST("/make_friends", (h.MakeFriend))
+	h.router.DELETE("/user", (h.DeleteUser))
+	h.router.GET("/friends", (h.GetFriends))
+	h.router.PUT("/user_id", (h.UpdateUserAge))
 
 }
 
@@ -60,19 +60,24 @@ func (h *Handler) Hello(c *gin.Context) {
 //CreateUser...
 func (h *Handler) CreateUser(c *gin.Context) {
 	var data dto.CreateUserDTO
-	err := c.ShouldBindJSON(data)
+	err := c.Bind(&data)
 	if err != nil {
 		c.String(http.StatusBadRequest, "cant parse params.Err:", err.Error())
 		return
 	}
+	fmt.Println(data)
 	defer c.Request.Body.Close()
 	err = data.Validate()
 	if err != nil {
 		c.String(http.StatusBadRequest, "validation failed. Err:", err.Error())
 		return
 	}
+	age, err := strconv.Atoi(data.Age)
+	if err != nil {
+		c.String(http.StatusBadRequest, "cant parse params", err.Error())
+	}
 	var user model.User
-	user.Name = data.Age
+	user.Age = uint64(age)
 	user.Name = data.Name
 	id, err := h.svc.CreateUser(c, user)
 	if err != nil {
@@ -85,7 +90,7 @@ func (h *Handler) CreateUser(c *gin.Context) {
 //MakeFriend...
 func (h *Handler) MakeFriend(c *gin.Context) {
 	var data dto.MakeFriendDTO
-	err := c.Bind(data)
+	err := c.Bind(&data)
 	if err != nil {
 		c.String(http.StatusBadRequest, "cant parse params.Err:", err.Error())
 		return

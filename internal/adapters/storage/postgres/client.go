@@ -33,7 +33,7 @@ func (c *Client) Connect() error {
 	if !ok || len(databaseURL) == 0 {
 		log.Fatalf("migrate: environment variable not declared: PG_URL")
 	}
-
+	//testurl := "postgres://postgres:Wild54323@localhost:5432/postgres"
 	databaseURL += "?sslmode=disable"
 	fmt.Println("URL:", c.ConnUrl)
 	conn, err := pgx.Connect(c.ctx, databaseURL)
