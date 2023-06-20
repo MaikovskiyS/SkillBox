@@ -12,9 +12,9 @@ type userRepository struct {
 	client Client
 }
 
-func NewUserRepository(cl *Client) service.UserRepository {
+func NewUserRepository(cl Client) service.UserRepository {
 	return &userRepository{
-		client: *cl,
+		client: cl,
 	}
 }
 

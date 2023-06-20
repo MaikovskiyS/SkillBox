@@ -3,7 +3,6 @@ package postgres
 import (
 	"context"
 	"fmt"
-	"log"
 	"os"
 	"skillbox/internal/config"
 
@@ -19,11 +18,11 @@ type Client struct {
 	Connection *pgx.Conn
 }
 
-func NewClient(logger *logrus.Logger, cfg *config.Config) *Client {
+func NewClient(logger logrus.Logger, cfg *config.Config) *Client {
 	return &Client{
 		ctx:     context.Background(),
 		ConnUrl: cfg.PG.URL,
-		Logger:  *logger,
+		Logger:  logger,
 	}
 }
 
@@ -31,7 +30,7 @@ func NewClient(logger *logrus.Logger, cfg *config.Config) *Client {
 func (c *Client) Connect() error {
 	databaseURL, ok := os.LookupEnv("PG_URL")
 	if !ok || len(databaseURL) == 0 {
-		log.Fatalf("migrate: environment variable not declared: PG_URL")
+		c.Logger.Fatalf("migrate: environment variable not declared: PG_URL")
 	}
 	//testurl := "postgres://postgres:Wild54323@localhost:5432/postgres"
 	databaseURL += "?sslmode=disable"
