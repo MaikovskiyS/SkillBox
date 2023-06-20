@@ -12,15 +12,15 @@ type userRepository struct {
 	client Client
 }
 
-func NewUserRepository(cl Client) service.UserRepository {
+func NewUserRepository(cl *Client) service.UserRepository {
 	return &userRepository{
-		client: cl,
+		client: *cl,
 	}
 }
 
 //Create...
 func (u *userRepository) CreateUser(ctx context.Context, data model.User) (uint64, error) {
-	u.client.Logger.Info("Create User in DB")
+	u.client.l.Info("Create User in DB")
 	var id uint64
 	err := u.client.Connection.QueryRow(ctx, "INSERT INTO users(name,age) values($1,$2) RETURNING ID", data.Name, data.Age).Scan(&id)
 	if err != nil {
@@ -44,10 +44,10 @@ func (u *userRepository) GetUser(ctx context.Context, id uint64) (model.User, er
 
 //MakeFriend...
 func (u *userRepository) MakeFriend(ctx context.Context, source, target uint64) error {
-	u.client.Logger.Info("Make firend in DB")
+	u.client.l.Info("Make firend in DB")
 	tag, err := u.client.Connection.Exec(ctx, "INSERT INTO friends(user_id,friend_id) values($1,$2)", target, source)
 	if err != nil {
-		u.client.Logger.Info(err, "problems with insert in MakeFriend")
+		u.client.l.Info(err, "problems with insert in MakeFriend")
 		return errors.New("cant make friend in DB")
 	}
 	if tag.RowsAffected() < 1 {
@@ -58,11 +58,11 @@ func (u *userRepository) MakeFriend(ctx context.Context, source, target uint64) 
 
 //DeleteUser...
 func (u *userRepository) DeleteUser(ctx context.Context, id uint64) error {
-	u.client.Logger.Info("Delete user form DB")
+	u.client.l.Info("Delete user form DB")
 	fmt.Println("id", id)
 	tag, err := u.client.Connection.Exec(ctx, "DELETE FROM users WHERE id=$1", id)
 	if err != nil {
-		u.client.Logger.Info("cant delete user")
+		u.client.l.Info("cant delete user")
 		return err
 	}
 	if tag.RowsAffected() < 1 {
@@ -73,11 +73,11 @@ func (u *userRepository) DeleteUser(ctx context.Context, id uint64) error {
 
 //DeleteUserFromFriends...
 func (u *userRepository) DeleteUserFromFriends(ctx context.Context, id uint64) error {
-	u.client.Logger.Info("Delete friend form DB")
+	u.client.l.Info("Delete friend form DB")
 	fmt.Println("id", id)
 	tag, err := u.client.Connection.Exec(ctx, "DELETE FROM friends WHERE friend_id=$1 or user_id=$2", id, id)
 	if err != nil {
-		u.client.Logger.Info("cant delete friend")
+		u.client.l.Info("cant delete friend")
 		return err
 	}
 	if tag.RowsAffected() < 1 {
@@ -88,10 +88,10 @@ func (u *userRepository) DeleteUserFromFriends(ctx context.Context, id uint64) e
 
 //GetFriends...
 func (u *userRepository) GetFriends(ctx context.Context, id uint64) ([]int, error) {
-	u.client.Logger.Info("GetFriends in DB")
+	u.client.l.Info("GetFriends in DB")
 	rows, err := u.client.Connection.Query(ctx, "select friend_id from friends where user_id=$1", id)
 	if err != nil {
-		u.client.Logger.Info("cant get friends")
+		u.client.l.Info("cant get friends")
 		return nil, err
 	}
 	defer rows.Close()
@@ -100,7 +100,7 @@ func (u *userRepository) GetFriends(ctx context.Context, id uint64) ([]int, erro
 		var id int
 		err = rows.Scan(&id)
 		if err != nil {
-			u.client.Logger.Info("cant parse rows")
+			u.client.l.Info("cant parse rows")
 			return nil, err
 		}
 		ids = append(ids, id)
@@ -114,10 +114,10 @@ func (u *userRepository) GetFriends(ctx context.Context, id uint64) ([]int, erro
 
 //UpdageAge...
 func (u *userRepository) UpdateUserAge(ctx context.Context, id, age uint64) error {
-	u.client.Logger.Info("ChangeAge in DB")
+	u.client.l.Info("ChangeAge in DB")
 	tag, err := u.client.Connection.Exec(ctx, "UPDATE users SET age=$1 WHERE id=$2", age, id)
 	if err != nil {
-		u.client.Logger.Info("cant update age")
+		u.client.l.Info("cant update age")
 		return err
 	}
 	if !tag.Update() {

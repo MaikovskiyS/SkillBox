@@ -14,15 +14,15 @@ import (
 type Client struct {
 	ctx        context.Context
 	ConnUrl    string
-	Logger     logrus.Logger
+	l          *logrus.Logger
 	Connection *pgx.Conn
 }
 
-func NewClient(logger logrus.Logger, cfg *config.Config) *Client {
+func NewClient(logger *logrus.Logger, cfg *config.Config) *Client {
 	return &Client{
 		ctx:     context.Background(),
 		ConnUrl: cfg.PG.URL,
-		Logger:  logger,
+		l:       logger,
 	}
 }
 
@@ -30,7 +30,7 @@ func NewClient(logger logrus.Logger, cfg *config.Config) *Client {
 func (c *Client) Connect() error {
 	databaseURL, ok := os.LookupEnv("PG_URL")
 	if !ok || len(databaseURL) == 0 {
-		c.Logger.Fatalf("migrate: environment variable not declared: PG_URL")
+		c.l.Fatalf("migrate: environment variable not declared: PG_URL")
 	}
 	//testurl := "postgres://postgres:Wild54323@localhost:5432/postgres"
 	databaseURL += "?sslmode=disable"
