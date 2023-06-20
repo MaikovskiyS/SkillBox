@@ -6,7 +6,6 @@ import (
 	"net/http/httptest"
 	"skillbox/internal/transport/http/dto"
 	mock_handler "skillbox/internal/transport/http/handler/mocks"
-	"skillbox/internal/transport/http/middleware"
 	"testing"
 
 	"github.com/gin-gonic/gin"
@@ -47,12 +46,11 @@ func TestCreateUser(t *testing.T) {
 			defer c.Finish()
 
 			l := logrus.New()
-			middle := middleware.New(l)
 			engine := gin.New()
 			svc := mock_handler.NewMockUserService(c)
 			testCases.mockBehavior(svc, testCases.inputData)
 
-			handler := New(svc, engine, middle, l)
+			handler := New(svc, engine, l)
 			engine.POST("/create", handler.CreateUser)
 			w := httptest.NewRecorder()
 			req := httptest.NewRequest("POST", "/create", bytes.NewBufferString(testCases.inputBody))

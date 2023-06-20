@@ -6,7 +6,6 @@ import (
 	"net/http"
 	"skillbox/internal/domain/model"
 	"skillbox/internal/transport/http/dto"
-	"skillbox/internal/transport/http/middleware"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
@@ -25,16 +24,14 @@ type UserService interface {
 
 type Handler struct {
 	l      *logrus.Logger
-	mw     *middleware.Middleware
 	svc    UserService
 	router *gin.Engine
 }
 
-func New(svc UserService, router *gin.Engine, mw *middleware.Middleware, logger *logrus.Logger) *Handler {
+func New(svc UserService, router *gin.Engine, logger *logrus.Logger) *Handler {
 	router.Use(gin.Recovery())
 	return &Handler{
 		l:      logger,
-		mw:     mw,
 		svc:    svc,
 		router: router,
 	}
