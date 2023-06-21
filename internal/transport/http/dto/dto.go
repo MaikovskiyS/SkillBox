@@ -5,6 +5,11 @@ import (
 	govalidator "github.com/go-ozzo/ozzo-validation/is"
 )
 
+// var (
+// 	ErrValidateWrongName = errors.New("name: must contain English letters only.")
+// 	ErrValidateWrongAge  = errors.New("age: must contain digits only.")
+// )
+
 type MakeFriendDTO struct {
 	Target string `json:"target_id"`
 	Source string `json:"source_id"`
