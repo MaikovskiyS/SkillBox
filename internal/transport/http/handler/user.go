@@ -37,24 +37,18 @@ func New(svc UserService, router *gin.Engine, logger *logrus.Logger) *Handler {
 	}
 }
 
-//RegisterRoutes...
+// RegisterRoutes registrating routes.
 func (h *Handler) RegisterRoutes() {
 	h.l.Info("register Routes")
-	h.router.GET("/", h.Hello)
-	h.router.POST("/create", (h.CreateUser))
-	h.router.POST("/make_friends", (h.MakeFriend))
+	h.router.POST("/user", (h.CreateUser))
+	h.router.POST("/friends", (h.MakeFriend))
 	h.router.DELETE("/user", (h.DeleteUser))
 	h.router.GET("/friends", (h.GetFriends))
 	h.router.PUT("/user_id", (h.UpdateUserAge))
 
 }
 
-//Hello...
-func (h *Handler) Hello(c *gin.Context) {
-	c.JSON(http.StatusOK, "hello from app on 8083 port")
-}
-
-//CreateUser...
+// Create creating new user.
 func (h *Handler) CreateUser(c *gin.Context) {
 	var data dto.CreateUserDTO
 	err := c.Bind(&data)
@@ -84,7 +78,7 @@ func (h *Handler) CreateUser(c *gin.Context) {
 	c.JSON(http.StatusCreated, fmt.Sprintf("User created. Id:%v", id))
 }
 
-//MakeFriend...
+// MakeFriend make friendship between 2 users.
 func (h *Handler) MakeFriend(c *gin.Context) {
 	var data dto.MakeFriendDTO
 	err := c.Bind(&data)
@@ -114,7 +108,7 @@ func (h *Handler) MakeFriend(c *gin.Context) {
 	c.JSON(http.StatusOK, fmt.Sprintf("Users %s and %s became friends", sourceName, targetName))
 }
 
-//DeleteUser...
+// Delete user.
 func (h *Handler) DeleteUser(c *gin.Context) {
 	var data dto.DeleteUserDto
 	err := c.Bind(&data)
@@ -148,7 +142,7 @@ func (h *Handler) DeleteUser(c *gin.Context) {
 	c.JSON(http.StatusOK, "user deleted")
 }
 
-//GetFriends...
+// GetFriends of a user.
 func (h *Handler) GetFriends(c *gin.Context) {
 	var data dto.GetFriendsDto
 	idstr := c.Query("id")
@@ -172,7 +166,7 @@ func (h *Handler) GetFriends(c *gin.Context) {
 	c.JSON(http.StatusOK, friends)
 }
 
-//UpdateAge...
+// UpdateAge of a user.
 func (h *Handler) UpdateUserAge(c *gin.Context) {
 	var data dto.UpdateUserAgeDTO
 	err := c.Bind(&data)
@@ -207,14 +201,3 @@ func (h *Handler) UpdateUserAge(c *gin.Context) {
 	}
 	c.JSON(http.StatusOK, "age changed")
 }
-
-// func validateUser(c *gin.Context) {
-// 	var u User
-// 	if err := c.ShouldBindJSON(&u); err == nil {
-// 		c.JSON(http.StatusOK, gin.H{"message": "User validation successful."})
-// 	} else {
-// 		c.JSON(http.StatusBadRequest, gin.H{
-// 			"message": "User validation failed!",
-// 			"error":   err.Error(),
-// 		})
-// 	}

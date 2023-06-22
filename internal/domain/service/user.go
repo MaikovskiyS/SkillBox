@@ -26,7 +26,7 @@ type service struct {
 	repo UserRepository
 }
 
-//New...
+// New service.
 func NewUserService(repo UserRepository, logger *logrus.Logger) handler.UserService {
 	return &service{
 		l:    logger,
@@ -34,7 +34,7 @@ func NewUserService(repo UserRepository, logger *logrus.Logger) handler.UserServ
 	}
 }
 
-//Create...
+// Create creating new user.
 func (s *service) CreateUser(ctx context.Context, data model.User) (uint64, error) {
 	id, err := s.repo.CreateUser(ctx, data)
 	if err != nil {
@@ -43,8 +43,7 @@ func (s *service) CreateUser(ctx context.Context, data model.User) (uint64, erro
 	return id, nil
 }
 
-//MakeFriend...
-//TODO проверка на дружбу
+// MakeFriend checks if there are users with the specified id, if there is, it adds the user with the source id to the list of friends of the target id.
 func (s *service) MakeFriend(ctx context.Context, source, target uint64) (string, string, error) {
 	targetUser, err := s.repo.GetUser(ctx, target)
 	if err != nil {
@@ -65,7 +64,7 @@ func (s *service) MakeFriend(ctx context.Context, source, target uint64) (string
 	return targetUser.Name, sourceUser.Name, nil
 }
 
-//Delete...
+// Delete user.
 func (s *service) DeleteUser(ctx context.Context, id uint64) error {
 	err := s.repo.DeleteUser(ctx, id)
 	if err != nil {
@@ -78,11 +77,11 @@ func (s *service) DeleteUser(ctx context.Context, id uint64) error {
 	return nil
 }
 
-//GetFriends...
+// GetFriends by ids
 func (s *service) GetFriends(ctx context.Context, id uint64) ([]model.User, error) {
 	ids, err := s.repo.GetFriends(ctx, id)
 	if err != nil {
-		//	s.l.Info(err, "GetFriends err in svc from repo")
+			s.l.Info(err)
 		return nil, err
 	}
 	if len(ids) == 0 {
@@ -101,7 +100,7 @@ func (s *service) GetFriends(ctx context.Context, id uint64) ([]model.User, erro
 	return friends, nil
 }
 
-//UpdateAge...
+// UpdateAge at user.
 func (s *service) UpdateUserAge(ctx context.Context, id, age uint64) error {
 	return s.repo.UpdateUserAge(ctx, id, age)
 }

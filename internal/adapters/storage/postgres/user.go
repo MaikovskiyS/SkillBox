@@ -18,7 +18,7 @@ func NewUserRepository(cl *Client) service.UserRepository {
 	}
 }
 
-//Create...
+//Create user in database.
 func (u *userRepository) CreateUser(ctx context.Context, data model.User) (uint64, error) {
 	u.client.l.Info("Create User in DB")
 	var id uint64
@@ -30,7 +30,7 @@ func (u *userRepository) CreateUser(ctx context.Context, data model.User) (uint6
 
 }
 
-//GetUser...
+// GetUser request user by id from users table.
 func (u *userRepository) GetUser(ctx context.Context, id uint64) (model.User, error) {
 	row := u.client.Connection.QueryRow(ctx, "select name,age from users where id=$1", id)
 	var user model.User
@@ -42,12 +42,12 @@ func (u *userRepository) GetUser(ctx context.Context, id uint64) (model.User, er
 	return user, nil
 }
 
-//MakeFriend...
+// MakeFriend adds target_id and source_id in friends table.
 func (u *userRepository) MakeFriend(ctx context.Context, source, target uint64) error {
 	u.client.l.Info("Make firend in DB")
 	tag, err := u.client.Connection.Exec(ctx, "INSERT INTO friends(user_id,friend_id) values($1,$2)", target, source)
 	if err != nil {
-		u.client.l.Info(err, "problems with insert in MakeFriend")
+		u.client.l.Info(err, "wrong insert in MakeFriend")
 		return errors.New("cant make friend in DB")
 	}
 	if tag.RowsAffected() < 1 {
@@ -56,10 +56,9 @@ func (u *userRepository) MakeFriend(ctx context.Context, source, target uint64) 
 	return nil
 }
 
-//DeleteUser...
+// DeleteUser form users table by id.
 func (u *userRepository) DeleteUser(ctx context.Context, id uint64) error {
 	u.client.l.Info("Delete user form DB")
-	fmt.Println("id", id)
 	tag, err := u.client.Connection.Exec(ctx, "DELETE FROM users WHERE id=$1", id)
 	if err != nil {
 		u.client.l.Info("cant delete user")
@@ -71,10 +70,9 @@ func (u *userRepository) DeleteUser(ctx context.Context, id uint64) error {
 	return nil
 }
 
-//DeleteUserFromFriends...
+// DeleteUserFromFriends by id.
 func (u *userRepository) DeleteUserFromFriends(ctx context.Context, id uint64) error {
 	u.client.l.Info("Delete friend form DB")
-	fmt.Println("id", id)
 	tag, err := u.client.Connection.Exec(ctx, "DELETE FROM friends WHERE friend_id=$1 or user_id=$2", id, id)
 	if err != nil {
 		u.client.l.Info("cant delete friend")
@@ -86,7 +84,7 @@ func (u *userRepository) DeleteUserFromFriends(ctx context.Context, id uint64) e
 	return nil
 }
 
-//GetFriends...
+// GetFriends by id.
 func (u *userRepository) GetFriends(ctx context.Context, id uint64) ([]int, error) {
 	u.client.l.Info("GetFriends in DB")
 	rows, err := u.client.Connection.Query(ctx, "select friend_id from friends where user_id=$1", id)
@@ -112,7 +110,7 @@ func (u *userRepository) GetFriends(ctx context.Context, id uint64) ([]int, erro
 	return ids, nil
 }
 
-//UpdageAge...
+// UpdageAge at user by id.
 func (u *userRepository) UpdateUserAge(ctx context.Context, id, age uint64) error {
 	u.client.l.Info("ChangeAge in DB")
 	tag, err := u.client.Connection.Exec(ctx, "UPDATE users SET age=$1 WHERE id=$2", age, id)
