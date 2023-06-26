@@ -8,6 +8,7 @@ import (
 	context "context"
 	reflect "reflect"
 	model "skillbox/internal/domain/model"
+	dto "skillbox/internal/transport/http/dto"
 
 	gomock "github.com/golang/mock/gomock"
 )
@@ -36,7 +37,7 @@ func (m *MockUserService) EXPECT() *MockUserServiceMockRecorder {
 }
 
 // CreateUser mocks base method.
-func (m *MockUserService) CreateUser(ctx context.Context, data model.User) (uint64, error) {
+func (m *MockUserService) CreateUser(ctx context.Context, data dto.CreateUserDTO) (uint64, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "CreateUser", ctx, data)
 	ret0, _ := ret[0].(uint64)

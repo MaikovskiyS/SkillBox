@@ -13,7 +13,7 @@ import (
 )
 
 type UserService interface {
-	CreateUser(ctx context.Context, data model.User) (uint64, error)
+	CreateUser(ctx context.Context, data dto.CreateUserDTO) (uint64, error)
 	MakeFriend(ctx context.Context, source, target uint64) (string, string, error)
 	GetFriends(ctx context.Context, id uint64) ([]model.User, error)
 	UpdateUserAge(ctx context.Context, id, age uint64) error
@@ -50,27 +50,33 @@ func (h *Handler) RegisterRoutes() {
 
 // Create creating new user.
 func (h *Handler) CreateUser(c *gin.Context) {
+	h.l.Info("in create user handle")
 	var data dto.CreateUserDTO
 	err := c.Bind(&data)
 	if err != nil {
+		h.l.Info("cant bing params")
 		c.String(http.StatusBadRequest, "cant parse params.Err:", err.Error())
 		return
 	}
 	fmt.Println(data)
 	defer c.Request.Body.Close()
-	err = data.Validate()
-	if err != nil {
-		c.String(http.StatusBadRequest, "validation failed. Err:", err.Error())
-		return
-	}
-	age, err := strconv.Atoi(data.Age)
-	if err != nil {
-		c.String(http.StatusBadRequest, "cant parse params", err.Error())
-	}
-	var user model.User
-	user.Age = uint64(age)
-	user.Name = data.Name
-	id, err := h.svc.CreateUser(c, user)
+	// err = data.Validate()
+	// if err != nil {
+	// 	c.String(http.StatusBadRequest, "validation failed. Err:", err.Error())
+	// 	return
+	// }
+	// age, err := strconv.Atoi(data.Age)
+	// if err != nil {
+	// 	c.String(http.StatusBadRequest, "cant parse params", err.Error())
+	// }
+	// ageu := uint64(age)
+	// user := model.User{
+	// 	Age:  ageu,
+	// 	Name: data.Name,
+	// }
+	// user.Age = uint64(age)
+	// user.Name = data.Name
+	id, err := h.svc.CreateUser(c, data)
 	if err != nil {
 		c.String(http.StatusBadRequest, "cant create User")
 		return
@@ -78,7 +84,7 @@ func (h *Handler) CreateUser(c *gin.Context) {
 	c.JSON(http.StatusCreated, fmt.Sprintf("User created. Id:%v", id))
 }
 
-// MakeFriend make friendship between 2 users.
+// MakeFriend add friendship between 2 users.
 func (h *Handler) MakeFriend(c *gin.Context) {
 	var data dto.MakeFriendDTO
 	err := c.Bind(&data)

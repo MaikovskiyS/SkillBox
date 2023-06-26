@@ -4,7 +4,9 @@ import (
 	"context"
 	"errors"
 	"skillbox/internal/domain/model"
+	"skillbox/internal/transport/http/dto"
 	"skillbox/internal/transport/http/handler"
+	"strconv"
 
 	"github.com/sirupsen/logrus"
 )
@@ -35,8 +37,16 @@ func NewUserService(repo UserRepository, logger *logrus.Logger) handler.UserServ
 }
 
 // Create creating new user.
-func (s *service) CreateUser(ctx context.Context, data model.User) (uint64, error) {
-	id, err := s.repo.CreateUser(ctx, data)
+func (s *service) CreateUser(ctx context.Context, data dto.CreateUserDTO) (uint64, error) {
+	var user model.User
+	age, err := strconv.Atoi(data.Age)
+	if err != nil {
+		s.l.Info(err)
+		//c.String(http.StatusBadRequest, "cant parse params", err.Error())
+	}
+	user.Age = uint64(age)
+	user.Name = data.Name
+	id, err := s.repo.CreateUser(ctx, user)
 	if err != nil {
 		s.l.Info(err)
 	}
@@ -81,7 +91,7 @@ func (s *service) DeleteUser(ctx context.Context, id uint64) error {
 func (s *service) GetFriends(ctx context.Context, id uint64) ([]model.User, error) {
 	ids, err := s.repo.GetFriends(ctx, id)
 	if err != nil {
-			s.l.Info(err)
+		s.l.Info(err)
 		return nil, err
 	}
 	if len(ids) == 0 {

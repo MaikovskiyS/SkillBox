@@ -4,10 +4,12 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"net/http/httptest"
-	"skillbox/internal/domain/model"
+	"skillbox/internal/transport/http/dto"
 	mock_handler "skillbox/internal/transport/http/handler/mocks"
+
 	"testing"
 
 	"github.com/gin-gonic/gin"
@@ -66,31 +68,45 @@ import (
 // }
 
 func TestCreateUser(t *testing.T) {
+	//init dependences
 	log := logrus.New()
 	eng := gin.Default()
-	ctrl := gomock.NewController(t)
-	defer ctrl.Finish()
 	ctx := context.Background()
 	exp := uint64(1)
-	data := model.User{
-		Age:  33,
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+	//create mock for service method
+	data := dto.CreateUserDTO{
+		Age:  "33",
 		Name: "stas",
 	}
 	svc := mock_handler.NewMockUserService(ctrl)
 	svc.EXPECT().CreateUser(ctx, data).Return(exp, nil)
-	b, err := json.Marshal(data)
+
+	//create handler
+	h := New(svc, eng, log)
+	//register handle func
+	eng.POST("/create", h.CreateUser)
+	//create request data
+	reqdata := dto.CreateUserDTO{
+		Age:  "33",
+		Name: "stas",
+	}
+	fmt.Println("reqdata:", reqdata)
+	reqbytes, err := json.Marshal(reqdata)
 	if err != nil {
 		t.Error()
 	}
-	h := New(svc, eng, log)
-	eng.POST("/create", h.CreateUser)
+	fmt.Println("reqbytes:", reqbytes)
+	//doing request
 	rec := httptest.NewRecorder()
-	req := httptest.NewRequest("POST", "/create", bytes.NewBuffer(b))
-
+	req := httptest.NewRequest("POST", "/create", bytes.NewBuffer(reqbytes))
 	eng.ServeHTTP(rec, req)
+	//read responce
 	responce := rec.Result()
 	defer responce.Body.Close()
 	dd, _ := ioutil.ReadAll(responce.Body)
+	//check result
 	assert.Equal(t, string(dd), exp)
 	//assert.Equal(t, rec.Code, http.StatusCreated)
 }
