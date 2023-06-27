@@ -3,33 +3,30 @@ package service
 import (
 	"context"
 	"errors"
+	"skillbox/internal/adapters/storage/postgres"
 	"skillbox/internal/domain/model"
-	"skillbox/internal/transport/http/dto"
-	"skillbox/internal/transport/http/handler"
-	"strconv"
 
 	"github.com/sirupsen/logrus"
 )
 
 //go:generate mockgen -source=user.go -destination=mocks/mock.go
 
-type UserRepository interface {
-	CreateUser(ctx context.Context, data model.User) (uint64, error)
-	MakeFriend(ctx context.Context, source, target uint64) error
-	GetUser(ctx context.Context, id uint64) (model.User, error)
-	DeleteUser(ctx context.Context, id uint64) error
-	DeleteUserFromFriends(ctx context.Context, id uint64) error
-	GetFriends(ctx context.Context, id uint64) ([]int, error)
-	UpdateUserAge(ctx context.Context, id uint64, age uint64) error
-}
+//go:generate mockgen -source=user.go -destination=mocks/mock.go
 
+type UserService interface {
+	CreateUser(ctx context.Context, data *model.User) (uint64, error)
+	MakeFriend(ctx context.Context, source, target uint64) (string, string, error)
+	GetFriends(ctx context.Context, id uint64) ([]model.User, error)
+	UpdateUserAge(ctx context.Context, id, age uint64) error
+	DeleteUser(ctx context.Context, id uint64) error
+}
 type service struct {
 	l    *logrus.Logger
-	repo UserRepository
+	repo postgres.UserRepository
 }
 
 // New service.
-func NewUserService(repo UserRepository, logger *logrus.Logger) handler.UserService {
+func NewUserService(repo postgres.UserRepository, logger *logrus.Logger) UserService {
 	return &service{
 		l:    logger,
 		repo: repo,
@@ -37,16 +34,16 @@ func NewUserService(repo UserRepository, logger *logrus.Logger) handler.UserServ
 }
 
 // Create creating new user.
-func (s *service) CreateUser(ctx context.Context, data dto.CreateUserDTO) (uint64, error) {
-	var user model.User
-	age, err := strconv.Atoi(data.Age)
-	if err != nil {
-		s.l.Info(err)
-		//c.String(http.StatusBadRequest, "cant parse params", err.Error())
-	}
-	user.Age = uint64(age)
-	user.Name = data.Name
-	id, err := s.repo.CreateUser(ctx, user)
+func (s *service) CreateUser(ctx context.Context, data *model.User) (uint64, error) {
+	// var user model.User
+	// age, err := strconv.Atoi(data.Age)
+	// if err != nil {
+	// 	s.l.Info(err)
+	// 	//c.String(http.StatusBadRequest, "cant parse params", err.Error())
+	// }
+	// user.Age = uint64(age)
+	// user.Name = data.Name
+	id, err := s.repo.CreateUser(ctx, *data)
 	if err != nil {
 		s.l.Info(err)
 	}

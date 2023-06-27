@@ -3,6 +3,7 @@ package server
 import (
 	"log"
 	"net/http"
+	"skillbox/internal/transport/http/handler"
 	"time"
 )
 
@@ -20,9 +21,9 @@ type Server struct {
 }
 
 // New -.
-func New(handler http.Handler) *Server {
+func New(router *handler.Router) *Server {
 	httpServer := &http.Server{
-		Handler:      handler,
+		Handler:      router.Engine,
 		ReadTimeout:  _defaultReadTimeout,
 		WriteTimeout: _defaultWriteTimeout,
 		Addr:         _defaultAddr,

@@ -7,14 +7,13 @@ import (
 	"skillbox/internal/transport/http/handler"
 	"skillbox/internal/transport/http/server"
 
-	"github.com/gin-gonic/gin"
 	"github.com/sirupsen/logrus"
 )
 
 //TODO Gracefull
 func Run(cfg *config.Config) {
 	l := logrus.New()
-	router := gin.Default()
+	//router := gin.Default()
 	client := postgres.NewClient(l, cfg)
 	err := client.Connect()
 	if err != nil {
@@ -23,9 +22,9 @@ func Run(cfg *config.Config) {
 	defer client.Close()
 	userRepo := postgres.NewUserRepository(client)
 	userSvc := service.NewUserService(userRepo, l)
-	handler := handler.New(userSvc, router, l)
+	router := handler.New(userSvc, l)
 	httpServer := server.New(router)
-	handler.RegisterRoutes()
+	router.RegisterRoutes()
 	httpServer.Start()
 
 }

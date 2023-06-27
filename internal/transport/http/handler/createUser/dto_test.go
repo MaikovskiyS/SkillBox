@@ -1,4 +1,4 @@
-package dto
+package createHandler
 
 import (
 	"testing"
@@ -10,19 +10,19 @@ import (
 func TestValidateOK(t *testing.T) {
 	cases := []struct {
 		name string
-		in   *CreateUserDTO
+		in   DTO
 	}{
 		{
 			name: "ok",
-			in: &CreateUserDTO{
+			in: DTO{
 				Name: "stas",
 				Age:  "31",
 			},
 		},
 	}
-	for _, casse := range cases {
+	for _, cases := range cases {
 
-		err := casse.in.Validate()
+		err := cases.in.Validate()
 		if err != nil {
 			t.Error()
 		}
@@ -34,26 +34,26 @@ func TestValidateOK(t *testing.T) {
 func TestValidationErr(t *testing.T) {
 	cases := []struct {
 		name string
-		in   *CreateUserDTO
+		in   DTO
 		exp  string
 	}{
 		{
 			name: "WrongName",
-			in: &CreateUserDTO{
+			in: DTO{
 				Name: "123",
 				Age:  "21",
 			},
 			exp: "name: must contain English letters only.",
 		}, {
 			name: "WrongAge",
-			in: &CreateUserDTO{
+			in: DTO{
 				Name: "name",
 				Age:  "asd",
 			},
 			exp: "age: must contain digits only.",
 		}, {
 			name: "EmptyFields",
-			in: &CreateUserDTO{
+			in: DTO{
 				Name: "",
 				Age:  "",
 			},

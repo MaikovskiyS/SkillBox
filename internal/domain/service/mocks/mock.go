@@ -8,35 +8,36 @@ import (
 	context "context"
 	reflect "reflect"
 	model "skillbox/internal/domain/model"
-
+"fmt"
 	gomock "github.com/golang/mock/gomock"
 )
 
-// MockUserRepository is a mock of UserRepository interface.
-type MockUserRepository struct {
+// MockUserService is a mock of UserService interface.
+type MockUserService struct {
 	ctrl     *gomock.Controller
-	recorder *MockUserRepositoryMockRecorder
+	recorder *MockUserServiceMockRecorder
 }
 
-// MockUserRepositoryMockRecorder is the mock recorder for MockUserRepository.
-type MockUserRepositoryMockRecorder struct {
-	mock *MockUserRepository
+// MockUserServiceMockRecorder is the mock recorder for MockUserService.
+type MockUserServiceMockRecorder struct {
+	mock *MockUserService
 }
 
-// NewMockUserRepository creates a new mock instance.
-func NewMockUserRepository(ctrl *gomock.Controller) *MockUserRepository {
-	mock := &MockUserRepository{ctrl: ctrl}
-	mock.recorder = &MockUserRepositoryMockRecorder{mock}
+// NewMockUserService creates a new mock instance.
+func NewMockUserService(ctrl *gomock.Controller) *MockUserService {
+	mock := &MockUserService{ctrl: ctrl}
+	mock.recorder = &MockUserServiceMockRecorder{mock}
 	return mock
 }
 
 // EXPECT returns an object that allows the caller to indicate expected use.
-func (m *MockUserRepository) EXPECT() *MockUserRepositoryMockRecorder {
+func (m *MockUserService) EXPECT() *MockUserServiceMockRecorder {
 	return m.recorder
 }
 
 // CreateUser mocks base method.
-func (m *MockUserRepository) CreateUser(ctx context.Context, data model.User) (uint64, error) {
+func (m *MockUserService) CreateUser(ctx context.Context, data *model.User) (uint64, error) {
+	fmt.Println("datain mock:",data)
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "CreateUser", ctx, data)
 	ret0, _ := ret[0].(uint64)
@@ -45,13 +46,13 @@ func (m *MockUserRepository) CreateUser(ctx context.Context, data model.User) (u
 }
 
 // CreateUser indicates an expected call of CreateUser.
-func (mr *MockUserRepositoryMockRecorder) CreateUser(ctx, data interface{}) *gomock.Call {
+func (mr *MockUserServiceMockRecorder) CreateUser(ctx, data interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateUser", reflect.TypeOf((*MockUserRepository)(nil).CreateUser), ctx, data)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateUser", reflect.TypeOf((*MockUserService)(nil).CreateUser), ctx, data)
 }
 
 // DeleteUser mocks base method.
-func (m *MockUserRepository) DeleteUser(ctx context.Context, id uint64) error {
+func (m *MockUserService) DeleteUser(ctx context.Context, id uint64) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "DeleteUser", ctx, id)
 	ret0, _ := ret[0].(error)
@@ -59,71 +60,44 @@ func (m *MockUserRepository) DeleteUser(ctx context.Context, id uint64) error {
 }
 
 // DeleteUser indicates an expected call of DeleteUser.
-func (mr *MockUserRepositoryMockRecorder) DeleteUser(ctx, id interface{}) *gomock.Call {
+func (mr *MockUserServiceMockRecorder) DeleteUser(ctx, id interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteUser", reflect.TypeOf((*MockUserRepository)(nil).DeleteUser), ctx, id)
-}
-
-// DeleteUserFromFriends mocks base method.
-func (m *MockUserRepository) DeleteUserFromFriends(ctx context.Context, id uint64) error {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "DeleteUserFromFriends", ctx, id)
-	ret0, _ := ret[0].(error)
-	return ret0
-}
-
-// DeleteUserFromFriends indicates an expected call of DeleteUserFromFriends.
-func (mr *MockUserRepositoryMockRecorder) DeleteUserFromFriends(ctx, id interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteUserFromFriends", reflect.TypeOf((*MockUserRepository)(nil).DeleteUserFromFriends), ctx, id)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteUser", reflect.TypeOf((*MockUserService)(nil).DeleteUser), ctx, id)
 }
 
 // GetFriends mocks base method.
-func (m *MockUserRepository) GetFriends(ctx context.Context, id uint64) ([]int, error) {
+func (m *MockUserService) GetFriends(ctx context.Context, id uint64) ([]model.User, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetFriends", ctx, id)
-	ret0, _ := ret[0].([]int)
+	ret0, _ := ret[0].([]model.User)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // GetFriends indicates an expected call of GetFriends.
-func (mr *MockUserRepositoryMockRecorder) GetFriends(ctx, id interface{}) *gomock.Call {
+func (mr *MockUserServiceMockRecorder) GetFriends(ctx, id interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetFriends", reflect.TypeOf((*MockUserRepository)(nil).GetFriends), ctx, id)
-}
-
-// GetUser mocks base method.
-func (m *MockUserRepository) GetUser(ctx context.Context, id uint64) (model.User, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetUser", ctx, id)
-	ret0, _ := ret[0].(model.User)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// GetUser indicates an expected call of GetUser.
-func (mr *MockUserRepositoryMockRecorder) GetUser(ctx, id interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetUser", reflect.TypeOf((*MockUserRepository)(nil).GetUser), ctx, id)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetFriends", reflect.TypeOf((*MockUserService)(nil).GetFriends), ctx, id)
 }
 
 // MakeFriend mocks base method.
-func (m *MockUserRepository) MakeFriend(ctx context.Context, source, target uint64) error {
+func (m *MockUserService) MakeFriend(ctx context.Context, source, target uint64) (string, string, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "MakeFriend", ctx, source, target)
-	ret0, _ := ret[0].(error)
-	return ret0
+	ret0, _ := ret[0].(string)
+	ret1, _ := ret[1].(string)
+	ret2, _ := ret[2].(error)
+	return ret0, ret1, ret2
 }
 
 // MakeFriend indicates an expected call of MakeFriend.
-func (mr *MockUserRepositoryMockRecorder) MakeFriend(ctx, source, target interface{}) *gomock.Call {
+func (mr *MockUserServiceMockRecorder) MakeFriend(ctx, source, target interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "MakeFriend", reflect.TypeOf((*MockUserRepository)(nil).MakeFriend), ctx, source, target)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "MakeFriend", reflect.TypeOf((*MockUserService)(nil).MakeFriend), ctx, source, target)
 }
 
 // UpdateUserAge mocks base method.
-func (m *MockUserRepository) UpdateUserAge(ctx context.Context, id, age uint64) error {
+func (m *MockUserService) UpdateUserAge(ctx context.Context, id, age uint64) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "UpdateUserAge", ctx, id, age)
 	ret0, _ := ret[0].(error)
@@ -131,7 +105,7 @@ func (m *MockUserRepository) UpdateUserAge(ctx context.Context, id, age uint64) 
 }
 
 // UpdateUserAge indicates an expected call of UpdateUserAge.
-func (mr *MockUserRepositoryMockRecorder) UpdateUserAge(ctx, id, age interface{}) *gomock.Call {
+func (mr *MockUserServiceMockRecorder) UpdateUserAge(ctx, id, age interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateUserAge", reflect.TypeOf((*MockUserRepository)(nil).UpdateUserAge), ctx, id, age)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateUserAge", reflect.TypeOf((*MockUserService)(nil).UpdateUserAge), ctx, id, age)
 }

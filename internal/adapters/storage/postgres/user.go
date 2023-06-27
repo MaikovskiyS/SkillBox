@@ -5,14 +5,22 @@ import (
 	"errors"
 	"fmt"
 	"skillbox/internal/domain/model"
-	"skillbox/internal/domain/service"
 )
 
+type UserRepository interface {
+	CreateUser(ctx context.Context, data model.User) (uint64, error)
+	MakeFriend(ctx context.Context, source, target uint64) error
+	GetUser(ctx context.Context, id uint64) (model.User, error)
+	DeleteUser(ctx context.Context, id uint64) error
+	DeleteUserFromFriends(ctx context.Context, id uint64) error
+	GetFriends(ctx context.Context, id uint64) ([]int, error)
+	UpdateUserAge(ctx context.Context, id uint64, age uint64) error
+}
 type userRepository struct {
 	client Client
 }
 
-func NewUserRepository(cl *Client) service.UserRepository {
+func NewUserRepository(cl *Client) UserRepository {
 	return &userRepository{
 		client: *cl,
 	}
