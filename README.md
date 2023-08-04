@@ -1,3 +1,3 @@
-# SkillBox
-module 31.5
-
+# UserService
+Basic service for CRUD requests.
+Can make friendship within two users.
