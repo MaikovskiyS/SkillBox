@@ -1,8 +1,10 @@
 # UserService
 
 The service handles client requests.
+
 The docker-compose file is used to build the application.
-We use nginx to distribute the load between application replicas.
+
+The nginx is used to distribute the load between application replicas.
 ___
 Endpoints:
 
