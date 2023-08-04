@@ -9,17 +9,17 @@ ___
 Endpoints:
 
 CreateUser
-  POST http//:localhost:8082/user
+  POST http://localhost:8082/user
   
 UpdateUserAge
-  PUT http//:localhost:8082/user
+  PUT http://localhost:8082/user
   
 DeleteUser
-  DELETE http//:localhost:8082/user
+  DELETE http://localhost:8082/user
   
 CreateFriendship
-  POST http//:localhost:8082/friends
+  POST http://localhost:8082/friends
   
 GetFriends
-  GET http//:localhost:8082/friends
+  GET http://localhost:8082/friends
 ___
