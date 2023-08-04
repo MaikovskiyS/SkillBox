@@ -4,7 +4,7 @@ The service handles client requests.
 
 The docker-compose file is used to build the application.
 
-The nginx is used to distribute the load between application replicas.
+The nginx is used like load balancer between application replicas.
 ___
 Endpoints:
 
