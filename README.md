@@ -7,8 +7,7 @@ Implemented:
  Migrations
  LoadBalancer
  Configs
- 
-Testing ___in process
+ Testing 
 ___
 ## Application launch:
 ```
