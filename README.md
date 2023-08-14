@@ -1,25 +1,30 @@
 # UserService
 
-The service handles client requests.
+User application.
 
-The docker-compose file is used to build the application.
-
-The nginx is used like load balancer between application replicas.
+Able to create a relationship between users - friendship.
+Implemented CRUD.
 ___
-Endpoints:
-
-CreateUser
-  POST http://localhost:8082/user
-  
-UpdateUserAge
-  PUT http://localhost:8082/user
-  
-DeleteUser
-  DELETE http://localhost:8082/user
-  
-CreateFriendship
-  POST http://localhost:8082/friends
-  
-GetFriends
-  GET http://localhost:8082/friends
+## Application launch:
+```
+docker compose up
+```
+## Test query file :
+```
+ testRequest.http
+```
 ___
+Design:
+- REST API
+- Clean Arcitecture
+
+Technologies usage:
+- Docker
+- Nginx
+- PostgresSql
+
+Frameworks:
+- PostgresCLient <a href="github.com/jackc/pgx/v5">pgx</a>
+- Gin <a href="https://github.com/gin-gonic/gin">gin-gonic/gin</a>
+- Logrus <a href="github.com/sirupsen/logrus">logrus</a>
+- Migrations <a href="github.com/golang-migrate/migrate/v4">migrate</a>
