@@ -26,7 +26,7 @@ Design:
 Technologies usage:
 - Docker
 - Nginx
-- PostgresSql
+- PostgreSql
 
 Frameworks:
 - PostgresCLient <a href="github.com/jackc/pgx/v5">pgx</a>
