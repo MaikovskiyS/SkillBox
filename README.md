@@ -1,9 +1,14 @@
-# UserService
+# User application.
 
-User application.
+Designed to work with users.
 
-Able to create a relationship between users - friendship.
-Implemented CRUD.
+Implemented:
+ CRUD
+ Migrations
+ LoadBalancer
+ Configs
+ 
+Testing ___in process
 ___
 ## Application launch:
 ```
